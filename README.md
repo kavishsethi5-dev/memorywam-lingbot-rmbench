@@ -15,6 +15,13 @@ The released RoboTwin weights are in EEF space, but XPolicyLab's adapter only do
 
 Note: observe_and_pickup on joint clips 5.2% of steps with the robotwin30 norm stats. Use EEF for it, or give it its own norm stats.
 
+## Precautions
+
+- Use this repo for the code. The Drive folder is only for the latent zips. If you find an older bundle zip anywhere, ignore it.
+- Download the zips one at a time, or with `gdown --folder <link>`. Downloading the whole Drive folder from the browser makes Google re-zip it and sometimes split it into parts.
+- Unzip the zips directly. Don't copy the extracted folders around, since the trainer checks that every episode's mp4 exists.
+- After `apply_patches.sh`, every step should print "patched" or "already patched". If one doesn't, the eval server can crash with "File name too long".
+
 ## Install
 
 ```bash
@@ -39,7 +46,7 @@ huggingface-cli download robbyant/lingbot-va-base --local-dir /path/to/lingbot-v
 huggingface-cli download robbyant/lingbot-va-posttrain-robotwin --local-dir /path/to/lingbot-va-posttrain-robotwin
 ```
 
-Latents are on Drive: `<task>_eef_latents_fps4.zip` and `<task>_latents_joint_fps5.zip` (press_button joint is `press_button_latents_fps5.zip`). Unzip the zip directly, don't copy folders, the trainer checks every mp4 exists.
+Latents are on Drive: `<task>_eef_latents_fps4.zip` and `<task>_latents_joint_fps5.zip` (press_button joint is `press_button_latents_fps5.zip`). See Precautions above.
 
 ```bash
 unzip press_button_eef_latents_fps4.zip -d /path/to/latents   # -> RMBench-press_button-aloha_agilex-ee
