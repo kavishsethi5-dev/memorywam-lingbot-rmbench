@@ -37,7 +37,7 @@ LingBot env: `XPolicyLab/policy/LingBot_VA/install.sh` (tested on XPolicyLab fa4
 bash apply_patches.sh /path/to/RMBench
 ```
 
-Adds the EEF config and eval mode, the memory window env var, and an optional flash-attn import. Only touches `XPolicyLab/policy/LingBot_VA/`.
+Adds the EEF config and eval mode, the memory window env var, an optional flash-attn import, and a fix for "File name too long" in the eval server. Only touches `XPolicyLab/policy/LingBot_VA/`.
 
 ## Weights and data
 
@@ -53,6 +53,8 @@ unzip press_button_eef_latents_fps4.zip -d /path/to/latents   # -> RMBench-press
 ```
 
 CPU checks in `checks/` if needed.
+
+Running on a shared cluster (disk, no resume, `.merged_ckpt`, multi-task layout, SLURM example): see [CLUSTER.md](CLUSTER.md).
 
 ## Train
 

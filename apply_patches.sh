@@ -38,5 +38,8 @@ python3 "${HERE}/patches/patch_flash_attn_import.py" "${LVA}/lingbot_va/wan_va/m
 cp "${HERE}/patches/process_data_eef.py" "${LVA}/"
 cp "${HERE}/patches/make_eef_lerobot.py" "${RMB}/"
 
+# 6. short eval output folder names (long instructions -> "File name too long" in the eval server)
+python3 "${HERE}/patches/patch_server_exp_name.py" "${LVA}/lingbot_va/wan_va/wan_va_server.py"
+
 echo "done. git -C ${RMB}/XPolicyLab status --short:"
 git -C "${RMB}/XPolicyLab" status --short
