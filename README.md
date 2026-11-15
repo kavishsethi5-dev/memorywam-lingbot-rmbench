@@ -97,7 +97,7 @@ bash eval.sh RMBench press_button RMBench-press_button-aloha_agilex-joint-0 aloh
 
 Zero-shot, the released weights don't solve press_button, so fine-tune first.
 
-## Memory knobs
+## Memory
 
 - `LINGBOT_VA_ATTN_WINDOW=<even n>` keeps n/2 chunks (default 72). A chunk is 32 steps for EEF, 24 for joint.
 - Longest press_button demo is 629 steps, so the default window never forgets. observe_and_pickup is ~160 steps, so only small windows matter there.
