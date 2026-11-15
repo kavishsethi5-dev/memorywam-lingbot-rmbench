@@ -41,5 +41,11 @@ cp "${HERE}/patches/make_eef_lerobot.py" "${RMB}/"
 # 6. short eval output folder names (long instructions -> "File name too long" in the eval server)
 python3 "${HERE}/patches/patch_server_exp_name.py" "${LVA}/lingbot_va/wan_va/wan_va_server.py"
 
+# 7. train.sh passes --seed, which wan_va/train.py rejects (training crashes at start)
+python3 "${HERE}/patches/patch_train_sh_seed.py" "${LVA}/train.sh"
+
+# 8. build per-task datasets without a multiprocessing Pool (the Pool hung on 10 tasks)
+python3 "${HERE}/patches/patch_dataset_init_pool.py" "${LVA}/lingbot_va/wan_va/dataset/lerobot_latent_dataset.py"
+
 echo "done. git -C ${RMB}/XPolicyLab status --short:"
 git -C "${RMB}/XPolicyLab" status --short
