@@ -39,6 +39,14 @@ va_rmbench_eef_train_cfg.batch_size = 1
 va_rmbench_eef_train_cfg.gradient_accumulation_steps = 8
 va_rmbench_eef_train_cfg.num_steps = 5000
 
+# Optional env overrides for short test runs (unset = the values above).
+for _env, _key in [("LINGBOT_VA_NUM_STEPS", "num_steps"),
+                   ("LINGBOT_VA_SAVE_INTERVAL", "save_interval"),
+                   ("LINGBOT_VA_LOAD_WORKER", "load_worker"),
+                   ("LINGBOT_VA_GRAD_ACCUM", "gradient_accumulation_steps")]:
+    if os.environ.get(_env):
+        va_rmbench_eef_train_cfg[_key] = int(os.environ[_env])
+
 # --- add to configs/__init__.py -------------------------------------------
 # from .va_rmbench_eef_cfg import va_rmbench_eef_cfg, va_rmbench_eef_train_cfg
 # and inside VA_CONFIGS = {...}:

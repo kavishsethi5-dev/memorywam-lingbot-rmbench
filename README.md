@@ -2,7 +2,7 @@
 
 Setup for training LingBot-VA on RMBench memory tasks. Based on XPolicyLab `fa431ec` (pinned by RMBench `7d1cdfc`).
 
-## Status (15 Nov)
+## Status (16 Nov)
 
 - EEF latents: all 10 RMBench tasks, on Drive. Each passes the trainer's loader check on every episode.
 - Joint latents: press_button, rearrange_blocks, observe_and_pickup only.
@@ -10,6 +10,7 @@ Setup for training LingBot-VA on RMBench memory tasks. Based on XPolicyLab `fa43
 - Tested on a Colab L4: training forward pass on our latents; eval server open-loop with posttrain-robotwin.
 - Training launch on 2x H200: crashed on `--seed` (upstream bug), fixed by `apply_patches.sh` step 7.
 - Multi-task dataset start-up: upstream Pool hung once with 10 tasks; `apply_patches.sh` step 8 loads tasks one by one.
+- Second H200 launch: crashed at the first compile with `[Errno 13] Permission denied: 'nvcc'` (torch 2.9 probes `nvcc --version` on every compile; the cluster's PATH had a broken nvcc). `apply_patches.sh` step 9 guards the probe.
 - Not tested: backward pass / full FSDP run, simulator eval.
 
 ## Setups
@@ -56,6 +57,8 @@ Patches (only `XPolicyLab/policy/LingBot_VA/`):
 6. short eval output folder names ("File name too long" fix)
 7. drop `--seed` from `train.sh` (`train.py` rejects it)
 8. build per-task datasets without a multiprocessing Pool (`LINGBOT_VA_INIT_POOL=1` restores it)
+9. guard torch's `nvcc --version` probe (a broken `nvcc` on PATH crashes the first compile)
+10. wan_va's folder first on `sys.path` in `train.py` and `wan_va_server.py` (Dask's `distributed`, preinstalled on Colab, hid `wan_va/distributed`)
 
 ## Weights and data
 
@@ -114,6 +117,7 @@ bash train.sh RMBench press_button aloha_agilex joint 0 0,1,2,3,4,5,6,7
 - Joint config: wandb on with placeholder keys, crashes. Set `enable_wandb = False` in `configs/va_robotwin30_train_cfg.py`. EEF: off.
 - Full fine-tune, FSDP, ~80 GB total (weights + grads + AdamW). Does not fit on one GPU.
 - lr 1e-5, batch 1, grad accum 8, 5000 steps, checkpoint every 200.
+- Short test run (EEF config only): `LINGBOT_VA_NUM_STEPS=10 LINGBOT_VA_SAVE_INTERVAL=5` (also `LINGBOT_VA_GRAD_ACCUM`, `LINGBOT_VA_LOAD_WORKER`). Unset = defaults.
 - Training randomises window (4 to 64) and chunk size (1 to 4).
 
 ### Cluster notes
@@ -125,7 +129,8 @@ bash train.sh RMBench press_button aloha_agilex joint 0 0,1,2,3,4,5,6,7
 - Disk: every checkpoint kept, ~10.6 GB each (bf16), save every 200 -> ~265 GB per 5000-step run. Symlink `checkpoints/` to scratch or raise `save_interval` in `va_rmbench_eef_cfg.py`.
 - Checkpoint path: `checkpoints/<bench>-<ckpt>-<env>-<action>-<seed>/checkpoints/checkpoint_step_<N>/transformer/`.
 - Each rank loads the fp32 transformer on CPU first: ask for plenty of RAM.
-- First step compiles flex attention (`torch.compile`): needs a C compiler and `Python.h` on the node.
+- First step compiles flex attention (`torch.compile`): needs a C compiler and `Python.h` on the node, and an Ampere or newer GPU (bf16 + flex attention; T4/V100 don't work).
+- torch 2.9 runs `nvcc --version` on every compile. Step 9 makes a broken `nvcc` on PATH harmless; no nvcc at all is fine too.
 - flash-attn not needed (patch 4 makes its import optional).
 - No internet on compute nodes: download weights and zips first, set `HF_HUB_OFFLINE=1`.
 

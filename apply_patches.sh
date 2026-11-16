@@ -47,5 +47,11 @@ python3 "${HERE}/patches/patch_train_sh_seed.py" "${LVA}/train.sh"
 # 8. build per-task datasets without a multiprocessing Pool (the Pool hung on 10 tasks)
 python3 "${HERE}/patches/patch_dataset_init_pool.py" "${LVA}/lingbot_va/wan_va/dataset/lerobot_latent_dataset.py"
 
+# 9. a broken `nvcc` on PATH crashes torch 2.9's first compile (PermissionError); guard the probe
+python3 "${HERE}/patches/patch_nvcc_probe.py" "${LVA}/lingbot_va/wan_va/modules/model.py"
+
+# 10. wan_va's own packages first on sys.path (an installed `distributed`, e.g. Dask on Colab, hid wan_va/distributed)
+python3 "${HERE}/patches/patch_sys_path_first.py" "${LVA}/lingbot_va/wan_va"
+
 echo "done. git -C ${RMB}/XPolicyLab status --short:"
 git -C "${RMB}/XPolicyLab" status --short
